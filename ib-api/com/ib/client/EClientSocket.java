@@ -6,7 +6,9 @@ package com.ib.client;
 import java.io.DataInputStream;
 import java.io.FilterInputStream;
 import java.io.IOException;
+import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.nio.channels.SocketChannel;
 
 public class EClientSocket extends EClient implements EClientMsgSink  {
 
@@ -17,7 +19,7 @@ public class EClientSocket extends EClient implements EClientMsgSink  {
 	private boolean m_asyncEConnect = false;
 	private boolean m_connected = false;
 	private Socket m_socket;
-		
+
 	public void setAsyncEConnect(boolean asyncEConnect) {
 		this.m_asyncEConnect = asyncEConnect;
 	}
@@ -44,9 +46,9 @@ public class EClientSocket extends EClient implements EClientMsgSink  {
     	if( m_useV100Plus ) {
     		buf.updateLength( 0 ); // New buffer means length header position is always zero
     	}
-    	
+
     	EMessage msg = new EMessage(buf);
-    	
+
     	sendMsg(msg);
     }
 
@@ -56,19 +58,19 @@ public class EClientSocket extends EClient implements EClientMsgSink  {
 	    m_dis = new DataInputStream(socket.getInputStream());
 	    m_defaultPort = socket.getPort();
 	    m_socket = socket;
-	
+
 	    sendConnectRequest();
-	
+
 	    // start reader thread
 	    EReader reader = new EReader(this, m_signal);
-	
+
 	    if (!m_asyncEConnect) {
 	    	reader.putMessageToQueue();
 
 	    	while (m_serverVersion == 0) {
 	    		m_signal.waitForSignal();
 	    		reader.processMsgs();
-	    	}       
+	    	}
 	    }
 	}
 
@@ -85,17 +87,18 @@ public class EClientSocket extends EClient implements EClientMsgSink  {
 	public synchronized void eConnect( String host, int port, int clientId, boolean extraAuth) {
 	    // already connected?
 	    m_host = checkConnected(host);
-	
+
 	    m_clientId = clientId;
 	    m_extraAuth = extraAuth;
 	    m_redirectCount = 0;
-	
+
 	    if(m_host == null){
 	        return;
 	    }
 	    try{
-	        Socket socket = new Socket( m_host, port);
-	        eConnect(socket);
+			SocketChannel sChan = SocketChannel.open();
+	        sChan.connect(new InetSocketAddress(m_host, port));
+	        eConnect(sChan.socket());
 	    }
 	    catch( Exception e) {
 	    	eDisconnect();
@@ -118,17 +121,17 @@ public class EClientSocket extends EClient implements EClientMsgSink  {
 	    		m_eWrapper.error(EClientErrors.NO_VALID_ID, EClientErrors.CONNECT_FAIL.code(), EClientErrors.CONNECT_FAIL.msg());
 	    		return;
 	    	}
-	    	
+
 	        ++m_redirectCount;
-	        
+
 	        if ( m_redirectCount > REDIRECT_COUNT_MAX ) {
 	            eDisconnect();
 	            m_eWrapper.error( "Redirect count exceeded" );
 	            return;
 	        }
-	                    
+
 	        eDisconnect( false );
-	        
+
 	      	try {
 				performRedirect( newAddress, m_defaultPort );
 			} catch (IOException e) {
@@ -140,14 +143,14 @@ public class EClientSocket extends EClient implements EClientMsgSink  {
 	@Override
 	public synchronized void serverVersion(int version, String time) {
 		m_serverVersion = version;
-		m_TwsTime = time;	
-		
+		m_TwsTime = time;
+
 		if( m_useV100Plus && (m_serverVersion < MIN_VERSION || m_serverVersion > MAX_VERSION) ) {
 			eDisconnect();
 			m_eWrapper.error(EClientErrors.NO_VALID_ID, EClientErrors.UNSUPPORTED_VERSION.code(), EClientErrors.UNSUPPORTED_VERSION.msg());
 			return;
 		}
-		
+
 	    if( m_serverVersion < MIN_SERVER_VER_SUPPORTED) {
 	    	eDisconnect();
 	        m_eWrapper.error( EClientErrors.NO_VALID_ID, EClientErrors.UPDATE_TWS.code(), EClientErrors.UPDATE_TWS.msg());
@@ -161,10 +164,10 @@ public class EClientSocket extends EClient implements EClientMsgSink  {
 				m_eWrapper.error(e);
 			}
 		}
-	    
-	    
+
+
 	    // set connected flag
-	    m_connected = true;       
+	    m_connected = true;
 
 	    if (!m_asyncEConnect)
 	    	startAPI();
@@ -172,7 +175,7 @@ public class EClientSocket extends EClient implements EClientMsgSink  {
 
 	protected synchronized void performRedirect( String address, int defaultPort ) throws IOException {
 	    System.out.println("Server Redirect: " + address);
-	    
+
 	    // Get host:port from address string and reconnect (note: port is optional)
 	    String[] array = address.split(":");
 	    m_host = array[0]; // reset connected host
@@ -184,7 +187,12 @@ public class EClientSocket extends EClient implements EClientMsgSink  {
 	        System.out.println( "Warning: redirect port is invalid, using default port");
 	        newPort = defaultPort;
 	    }
-	    eConnect( new Socket( m_host, newPort ) );
+
+		SocketChannel sChan = SocketChannel.open();
+			        sChan.connect(new InetSocketAddress(m_host, newPort));
+			        eConnect(sChan.socket());
+
+	    eConnect( sChan.socket() );
 	}
 
 	@Override
@@ -197,7 +205,7 @@ public class EClientSocket extends EClient implements EClientMsgSink  {
 	    if( m_dis == null && m_socketTransport == null) {
 	        return;
 	    }
-	
+
 	    if ( resetState ) {
 	    	m_connected = false;
 	        m_extraAuth = false;
@@ -206,7 +214,7 @@ public class EClientSocket extends EClient implements EClientMsgSink  {
 	        m_TwsTime = "";
 	        m_redirectCount = 0;
 	    }
-	
+
 	    FilterInputStream dis = m_dis;
 	    m_dis = null;
 	    if (m_socketTransport != null) {
@@ -217,7 +225,7 @@ public class EClientSocket extends EClient implements EClientMsgSink  {
 				m_socketTransport = null;
 			}
 		}
-	
+
 	    try {
 	        if (dis != null)
 	        	dis.close();

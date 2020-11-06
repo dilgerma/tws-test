@@ -14,17 +14,17 @@ import java.util.Set;
 public class EWrapperMsgGenerator {
     public static final String SCANNER_PARAMETERS = "SCANNER PARAMETERS:";
     public static final String FINANCIAL_ADVISOR = "FA:";
-    
+
 	public static String tickPrice( int tickerId, int field, double price, TickAttrib attribs) {
-    	return "id=" + tickerId + "  " + TickType.getField( field) + "=" + price + " " + 
+    	return "id=" + tickerId + "  " + TickType.getField( field) + "=" + price + " " +
         (attribs.canAutoExecute() ? " canAutoExecute" : " noAutoExecute") + " pastLimit = " + attribs.pastLimit() +
         (field == TickType.BID.index() || field == TickType.ASK.index() ? " preOpen = " + attribs.preOpen() : "");
     }
-	
+
     public static String tickSize( int tickerId, int field, int size) {
     	return "id=" + tickerId + "  " + TickType.getField( field) + "=" + size;
     }
-    
+
     public static String tickOptionComputation( int tickerId, int field, double impliedVol,
     		double delta, double optPrice, double pvDividend,
     		double gamma, double vega, double theta, double undPrice) {
@@ -38,15 +38,15 @@ public class EWrapperMsgGenerator {
             " pvDividend = " + Util.maxDoubleToString(pvDividend) +
             " undPrice = " + Util.maxDoubleToString(undPrice);
     }
-    
+
     public static String tickGeneric(int tickerId, int tickType, double value) {
     	return "id=" + tickerId + "  " + TickType.getField( tickType) + "=" + value;
     }
-    
+
     public static String tickString(int tickerId, int tickType, String value) {
     	return "id=" + tickerId + "  " + TickType.getField( tickType) + "=" + value;
     }
-    
+
     public static String tickEFP(int tickerId, int tickType, double basisPoints,
 			String formattedBasisPoints, double impliedFuture, int holdDays,
 			String futureLastTradeDate, double dividendImpact, double dividendsToLastTradeDate) {
@@ -56,7 +56,7 @@ public class EWrapperMsgGenerator {
 		" futureLastTradeDate = " + futureLastTradeDate + " dividendImpact = " + dividendImpact +
 		" dividends to expiry = "	+ dividendsToLastTradeDate;
     }
-    
+
     public static String orderStatus( int orderId, String status, double filled, double remaining,
             double avgFillPrice, int permId, int parentId, double lastFillPrice,
             int clientId, String whyHeld, double mktCapPrice) {
@@ -65,22 +65,22 @@ public class EWrapperMsgGenerator {
         " avgFillPrice=" + avgFillPrice + " lastFillPrice=" + lastFillPrice +
         " parent Id=" + parentId + " whyHeld=" + whyHeld + " mktCapPrice=" + mktCapPrice;
     }
-    
+
     public static String openOrder( int orderId, Contract contract, Order order, OrderState orderState) {
 		final StringBuilder sb = new StringBuilder(1024);
         sb.append("open order:");
         appendOrderFields(sb, orderId, contract, order, orderState, true);
         return sb.toString();
     }
-    
+
     public static String openOrderEnd() {
     	return " =============== end ===============";
     }
-    
+
     public static String updateAccountValue(String key, String value, String currency, String accountName) {
     	return "updateAccountValue: " + key + " " + value + " " + currency + " " + accountName;
     }
-    
+
     public static String updatePortfolio(Contract contract, double position, double marketPrice,
     									 double marketValue, double averageCost, double unrealizedPNL,
     									 double realizedPNL, String accountName) {
@@ -88,19 +88,19 @@ public class EWrapperMsgGenerator {
             + contractMsg(contract)
             + position + " " + marketPrice + " " + marketValue + " " + averageCost + " " + unrealizedPNL + " " + realizedPNL + " " + accountName;
     }
-    
+
     public static String updateAccountTime(String timeStamp) {
     	return "updateAccountTime: " + timeStamp;
     }
-    
+
     public static String accountDownloadEnd(String accountName) {
     	return "accountDownloadEnd: " + accountName;
     }
-    
+
     public static String nextValidId( int orderId) {
     	return "Next Valid Order ID: " + orderId;
     }
-    
+
     public static String contractDetails(int reqId, ContractDetails contractDetails) {
     	Contract contract = contractDetails.contract();
 		return "reqId = " + reqId + " ===================================\n"
@@ -108,7 +108,7 @@ public class EWrapperMsgGenerator {
             + contractMsg(contract) + contractDetailsMsg(contractDetails)
             + " ---- Contract Details End ----\n";
     }
-    
+
     private static String contractDetailsMsg(ContractDetails contractDetails) {
 		return "marketName = " + contractDetails.marketName() + "\n"
         + "minTick = " + contractDetails.minTick() + "\n"
@@ -133,10 +133,9 @@ public class EWrapperMsgGenerator {
         + "marketRuleIds = " + contractDetails.marketRuleIds() + "\n"
         + "realExpirationDate = " + contractDetails.realExpirationDate() + "\n"
         + "lastTradeTime = " + contractDetails.lastTradeTime() + "\n"
-        + "stockType = " + contractDetails.stockType() + "\n"
         + contractDetailsSecIdList(contractDetails);
     }
-    
+
 	private static String contractMsg(Contract contract) {
 		return "conid = " + contract.conid() + "\n"
         + "symbol = " + contract.symbol() + "\n"
@@ -151,10 +150,10 @@ public class EWrapperMsgGenerator {
         + "localSymbol = " + contract.localSymbol() + "\n"
         + "tradingClass = " + contract.tradingClass() + "\n";
     }
-	
+
     public static String bondContractDetails(int reqId, ContractDetails contractDetails) {
         Contract contract = contractDetails.contract();
-		return "reqId = " + reqId + " ===================================\n"	
+		return "reqId = " + reqId + " ===================================\n"
         + " ---- Bond Contract Details begin ----\n"
         + "symbol = " + contract.symbol() + "\n"
         + "secType = " + contract.getSecType() + "\n"
@@ -192,7 +191,7 @@ public class EWrapperMsgGenerator {
         + contractDetailsSecIdList(contractDetails)
         + " ---- Bond Contract Details End ----\n";
     }
-    
+
     private static String contractDetailsSecIdList(ContractDetails contractDetails) {
         final StringBuilder sb = new StringBuilder(32);
         sb.append("secIdList={");
@@ -211,7 +210,7 @@ public class EWrapperMsgGenerator {
     public static String contractDetailsEnd(int reqId) {
     	return "reqId = " + reqId + " =============== end ===============";
     }
-    
+
     public static String execDetails( int reqId, Contract contract, Execution execution) {
 		return " ---- Execution Details begin ----\n"
         + "reqId = " + reqId + "\n"
@@ -236,33 +235,33 @@ public class EWrapperMsgGenerator {
         + "lastLiquidity = " + execution.lastLiquidity() + "\n"
         + " ---- Execution Details end ----\n";
     }
-    
+
     public static String execDetailsEnd(int reqId) {
     	return "reqId = " + reqId + " =============== end ===============";
     }
-    
+
     public static String updateMktDepth( int tickerId, int position, int operation, int side,
     									 double price, int size) {
     	return "updateMktDepth: " + tickerId + " " + position + " " + operation + " " + side + " " + price + " " + size;
     }
-    
+
     public static String updateMktDepthL2( int tickerId, int position, String marketMaker,
     									   int operation, int side, double price, int size, boolean isSmartDepth) {
     	return "updateMktDepth: " + tickerId + " " + position + " " + marketMaker + " " + operation + " " + side + " " + price + " " + size + " " + isSmartDepth;
     }
-    
+
     public static String updateNewsBulletin( int msgId, int msgType, String message, String origExchange) {
     	return "MsgId=" + msgId + " :: MsgType=" + msgType +  " :: Origin=" + origExchange + " :: Message=" + message;
     }
-    
+
     public static String managedAccounts( String accountsList) {
     	return "Connected : The list of managed accounts are : [" + accountsList + "]";
     }
-    
+
     public static String receiveFA(int faDataType, String xml) {
     	return FINANCIAL_ADVISOR + " " + EClient.faMsgTypeName(faDataType) + " " + xml;
     }
-    
+
     public static String historicalData(int reqId, String date, double open, double high, double low,
                       					double close, long volume, int count, double WAP) {
     	return "id=" + reqId +
@@ -280,7 +279,7 @@ public class EWrapperMsgGenerator {
     			" start date = " + startDate +
     			" end date=" + endDate;
     }
-    
+
 	public static String realtimeBar(int reqId, long time, double open,
 			double high, double low, double close, long volume, double wap, int count) {
         return "id=" + reqId +
@@ -293,11 +292,11 @@ public class EWrapperMsgGenerator {
         " count=" + count +
         " WAP=" + wap;
 	}
-	
+
     public static String scannerParameters(String xml) {
     	return SCANNER_PARAMETERS + "\n" + xml;
     }
-    
+
     public static String scannerData(int reqId, int rank, ContractDetails contractDetails,
     								 String distance, String benchmark, String projection,
     								 String legsStr) {
@@ -319,11 +318,11 @@ public class EWrapperMsgGenerator {
         " projection=" + projection +
         " legsStr=" + legsStr;
     }
-    
+
     public static String scannerDataEnd(int reqId) {
     	return "id = " + reqId + " =============== end ===============";
     }
-    
+
     public static String currentTime(long time) {
 		return "current time = " + time +
 		" (" + DateFormat.getDateTimeInstance().format(new Date(time * 1000)) + ")";
@@ -332,7 +331,7 @@ public class EWrapperMsgGenerator {
     public static String fundamentalData(int reqId, String data) {
 		return "id  = " + reqId + " len = " + data.length() + '\n' + data;
     }
-    
+
     public static String deltaNeutralValidation(int reqId, DeltaNeutralContract deltaNeutralContract) {
     	return "id = " + reqId
     	+ " deltaNeutralContract.conId =" + deltaNeutralContract.conid()
@@ -342,11 +341,11 @@ public class EWrapperMsgGenerator {
     public static String tickSnapshotEnd(int tickerId) {
     	return "id=" + tickerId + " =============== end ===============";
     }
-    
+
     public static String marketDataType(int reqId, int marketDataType){
     	return "id=" + reqId + " marketDataType = " + MarketDataType.getField(marketDataType);
     }
-    
+
     public static String commissionReport( CommissionReport commissionReport) {
 		return "commission report:" +
         " execId=" + commissionReport.execId() +
@@ -356,7 +355,7 @@ public class EWrapperMsgGenerator {
         " yield=" + Util.DoubleMaxString(commissionReport.yield()) +
         " yieldRedemptionDate=" + Util.IntMaxString(commissionReport.yieldRedemptionDate());
     }
-    
+
     public static String position( String account, Contract contract, double pos, double avgCost) {
 		return " ---- Position begin ----\n"
         + "account = " + account + "\n"
@@ -364,7 +363,7 @@ public class EWrapperMsgGenerator {
         + "position = " + Util.DoubleMaxString(pos) + "\n"
         + "avgCost = " + Util.DoubleMaxString(avgCost) + "\n"
         + " ---- Position end ----\n";
-    }    
+    }
 
     public static String positionEnd() {
         return " =============== end ===============";
@@ -393,20 +392,20 @@ public class EWrapperMsgGenerator {
         + "position = " + Util.DoubleMaxString(pos) + "\n"
         + "avgCost = " + Util.DoubleMaxString(avgCost) + "\n"
         + " ---- Position end ----\n";
-    }    
+    }
 
     public static String positionMultiEnd( int reqId) {
         return "id = " + reqId + " =============== end ===============";
     }
 
     public static String accountUpdateMulti( int reqId, String account, String modelCode, String key, String value, String currency) {
-		return " id = " + reqId + " account = " + account + " modelCode = " + modelCode + 
+		return " id = " + reqId + " account = " + account + " modelCode = " + modelCode +
                 " key = " + key + " value = " + value + " currency = " + currency;
     }
 
     public static String accountUpdateMultiEnd( int reqId) {
     	return "id = " + reqId + " =============== end ===============";
-    }    
+    }
 
 	public static String securityDefinitionOptionalParameter(int reqId, String exchange, int underlyingConId, String tradingClass,
 			String multiplier, Set<String> expirations, Set<Double> strikes) {
@@ -487,7 +486,7 @@ public class EWrapperMsgGenerator {
 					.append(", secType: ").append(depthMktDataDescriptions[i].secType())
 					.append(", listingExch: ").append(depthMktDataDescriptions[i].listingExch())
 					.append(", serviceDataType: ").append(depthMktDataDescriptions[i].serviceDataType())
-					.append(", aggGroup: ").append(depthMktDataDescriptions[i].aggGroup() != Integer.MAX_VALUE ? 
+					.append(", aggGroup: ").append(depthMktDataDescriptions[i].aggGroup() != Integer.MAX_VALUE ?
 							depthMktDataDescriptions[i].aggGroup() : "").append("\n");
 		}
 		sb.append("==== Market Depth Exchanges End (total=").append(depthMktDataDescriptions.length).append(") ====\n");
@@ -495,7 +494,7 @@ public class EWrapperMsgGenerator {
 	}
 
 	public static String tickNews(int tickerId, long timeStamp, String providerCode, String articleId, String headline, String extraData) {
-		return "TickNews. tickerId: " + tickerId + ", timeStamp: " + Util.UnixMillisecondsToString(timeStamp, "yyyy-MM-dd HH:mm:ss zzz") + 
+		return "TickNews. tickerId: " + tickerId + ", timeStamp: " + Util.UnixMillisecondsToString(timeStamp, "yyyy-MM-dd HH:mm:ss zzz") +
 				", providerCode: " + providerCode + ", articleId: " + articleId + ", headline: " + headline + ", extraData: " + extraData;
 	}
 
@@ -524,15 +523,15 @@ public class EWrapperMsgGenerator {
 
 	public static String softDollarTiers(SoftDollarTier[] tiers) {
 		StringBuilder sb = new StringBuilder();
-		
+
 		sb.append("==== Soft Dollar Tiers Begin (total=").append(tiers.length).append(") ====\n");
-		
+
 		for (SoftDollarTier tier : tiers) {
 			sb.append(tier).append("\n");
 		}
-		
+
 		sb.append("==== Soft Dollar Tiers End (total=").append(tiers.length).append(") ====\n");
-		
+
 		return sb.toString();
 	}
 
@@ -542,15 +541,15 @@ public class EWrapperMsgGenerator {
 
 	public static String smartComponents(int reqId, Map<Integer, Entry<String, Character>> theMap) {
 		StringBuilder sb = new StringBuilder();
-		
+
 		sb.append("==== Smart Components Begin (total=").append(theMap.entrySet().size()).append(") reqId = ").append(reqId).append("====\n");
-		
-		for (Map.Entry<Integer, Entry<String, Character>> item : theMap.entrySet()) {
+
+		for (Entry<Integer, Entry<String, Character>> item : theMap.entrySet()) {
 			sb.append("bit number: ").append(item.getKey()).append(", exchange: ").append(item.getValue().getKey()).append(", exchange letter: ").append(item.getValue().getValue()).append("\n");
 		}
-		
+
 		sb.append("==== Smart Components End (total=").append(theMap.entrySet().size()).append(") reqId = ").append(reqId).append("====\n");
-		
+
 		return sb.toString();
 	}
 
@@ -567,9 +566,9 @@ public class EWrapperMsgGenerator {
 		sb.append("==== News Article End requestId: ").append(requestId).append(" ====\n");
 		return sb.toString();
 	}
-	
+
 	public static String historicalNews(int requestId, String time, String providerCode, String articleId, String headline) {
-		return "Historical News. RequestId: " + requestId + ", time: " + time + ", providerCode: " + providerCode + 
+		return "Historical News. RequestId: " + requestId + ", time: " + time + ", providerCode: " + providerCode +
 				", articleId: " + articleId + ", headline: " + headline;
 	}
 
@@ -577,17 +576,17 @@ public class EWrapperMsgGenerator {
 		return "Historical News End. RequestId: " + requestId + ", hasMore: " + hasMore;
 	}
 
-	public static String headTimestamp(int reqId, String headTimestamp) {		
+	public static String headTimestamp(int reqId, String headTimestamp) {
 		return "Head timestamp. Req Id: " + reqId + ", headTimestamp: " + headTimestamp;
 	}
 
 	public static String histogramData(int reqId, List<HistogramEntry> items) {
-		StringBuilder sb = new StringBuilder();		
-		sb.append("Histogram data. Req Id: ").append(reqId).append(", Data (").append(items.size()).append("):\n");		
-		items.forEach(i -> sb.append("\tPrice: ").append(i.price()).append(", Size: ").append(i.size()).append("\n"));
+		StringBuilder sb = new StringBuilder();
+		sb.append("Histogram data. Req Id: ").append(reqId).append(", Data (").append(items.size()).append("):\n");
+		items.forEach(i -> sb.append("\tPrice: ").append(i.price).append(", Size: ").append(i.size).append("\n"));
 		return sb.toString();
 	}
-	
+
 	public static String rerouteMktDataReq(int reqId, int conId, String exchange) {
 		return "Re-route market data request. Req Id: " + reqId + ", Con Id: " + conId + ", Exchange: " + exchange;
 	}
@@ -595,7 +594,7 @@ public class EWrapperMsgGenerator {
 	public static String rerouteMktDepthReq(int reqId, int conId, String exchange) {
 		return "Re-route market depth request. Req Id: " + reqId + ", Con Id: " + conId + ", Exchange: " + exchange;
 	}
-	
+
 	public static String marketRule(int marketRuleId, PriceIncrement[] priceIncrements) {
 		DecimalFormat df = new DecimalFormat("#.#");
 		df.setMaximumFractionDigits(340);
@@ -609,69 +608,69 @@ public class EWrapperMsgGenerator {
 		sb.append("==== Market Rule End (marketRuleId=").append(marketRuleId).append(") ====\n");
 		return sb.toString();
 	}
-	
+
 
     public static String pnl(int reqId, double dailyPnL, double unrealizedPnL, double realizedPnL) {
 		return "Daily PnL. Req Id: " + reqId + ", daily PnL: " + dailyPnL + ", unrealizedPnL: " + unrealizedPnL + ", realizedPnL: " + realizedPnL;
     }
-    
+
     public static String pnlSingle(int reqId, int pos, double dailyPnL, double unrealizedPnL, double realizedPnL, double value) {
 		return "Daily PnL Single. Req Id: " + reqId + ", pos: " + pos + ", daily PnL: " + dailyPnL + ", unrealizedPnL: " + unrealizedPnL + ", realizedPnL: " + realizedPnL + ", value: " + value;
     }
 
     public static String historicalTick(int reqId, long time, double price, long size) {
-        return "Historical Tick. Req Id: " + reqId + ", time: " + Util.UnixSecondsToString(time, "yyyyMMdd-HH:mm:ss zzz") + ", price: " + price + ", size: " 
+        return "Historical Tick. Req Id: " + reqId + ", time: " + Util.UnixSecondsToString(time, "yyyyMMdd-HH:mm:ss zzz") + ", price: " + price + ", size: "
                 + size;
     }
 
     public static String historicalTickBidAsk(int reqId, long time, TickAttribBidAsk tickAttribBidAsk, double priceBid, double priceAsk,
             long sizeBid, long sizeAsk) {
-        return "Historical Tick Bid/Ask. Req Id: " + reqId + ", time: " + Util.UnixSecondsToString(time, "yyyyMMdd-HH:mm:ss zzz") + ", bid price: " + priceBid 
-                + ", ask price: " + priceAsk + ", bid size: " + sizeBid + ", ask size: " + sizeAsk 
+        return "Historical Tick Bid/Ask. Req Id: " + reqId + ", time: " + Util.UnixSecondsToString(time, "yyyyMMdd-HH:mm:ss zzz") + ", bid price: " + priceBid
+                + ", ask price: " + priceAsk + ", bid size: " + sizeBid + ", ask size: " + sizeAsk
                 + ", tick attribs: " + (tickAttribBidAsk.bidPastLow() ? "bidPastLow " : "") + (tickAttribBidAsk.askPastHigh() ? "askPastHigh " : "");
     }
 
     public static String historicalTickLast(int reqId, long time, TickAttribLast tickAttribLast, double price, long size, String exchange,
-            String specialConditions) {        
-        return "Historical Tick Last. Req Id: " + reqId + ", time: " + Util.UnixSecondsToString(time, "yyyyMMdd-HH:mm:ss zzz") + ", price: " + price + ", size: " 
-                + size + ", exchange: " + exchange + ", special conditions:" + specialConditions 
+            String specialConditions) {
+        return "Historical Tick Last. Req Id: " + reqId + ", time: " + Util.UnixSecondsToString(time, "yyyyMMdd-HH:mm:ss zzz") + ", price: " + price + ", size: "
+                + size + ", exchange: " + exchange + ", special conditions:" + specialConditions
                 + ", tick attribs: " + (tickAttribLast.pastLimit() ? "pastLimit " : "") + (tickAttribLast.unreported() ? "unreported " : "");
     }
-    
-    public static String tickByTickAllLast(int reqId, int tickType, long time, double price, int size, TickAttribLast tickAttribLast, 
+
+    public static String tickByTickAllLast(int reqId, int tickType, long time, double price, int size, TickAttribLast tickAttribLast,
             String exchange, String specialConditions){
         return (tickType == 1 ? "Last." : "AllLast.") +
                 " Req Id: " + reqId + " Time: " + Util.UnixSecondsToString(time, "yyyyMMdd-HH:mm:ss zzz") + " Price: " + price + " Size: " + size +
                 " Exch: " + exchange + " Spec Cond: " + specialConditions + " Tick Attibs: " + (tickAttribLast.pastLimit() ? "pastLimit " : "") +
                 (tickType == 1 ? "" : (tickAttribLast.unreported() ? "unreported " : ""));
     }
-    
+
     public static String tickByTickBidAsk(int reqId, long time, double bidPrice, double askPrice, int bidSize, int askSize,
             TickAttribBidAsk tickAttribBidAsk){
-        return "BidAsk. Req Id: " + reqId + " Time: " + Util.UnixSecondsToString(time, "yyyyMMdd-HH:mm:ss zzz") + " BidPrice: " + bidPrice + 
-                " AskPrice: " + askPrice + " BidSize: " + bidSize + " AskSize: " + askSize + " Tick Attibs: " + 
+        return "BidAsk. Req Id: " + reqId + " Time: " + Util.UnixSecondsToString(time, "yyyyMMdd-HH:mm:ss zzz") + " BidPrice: " + bidPrice +
+                " AskPrice: " + askPrice + " BidSize: " + bidSize + " AskSize: " + askSize + " Tick Attibs: " +
                 (tickAttribBidAsk.bidPastLow() ? "bidPastLow " : "") + (tickAttribBidAsk.askPastHigh() ? "askPastHigh " : "");
     }
 
     public static String tickByTickMidPoint(int reqId, long time, double midPoint){
         return "MidPoint. Req Id: " + reqId + " Time: " + Util.UnixSecondsToString(time, "yyyyMMdd-HH:mm:ss zzz") + " MidPoint: " + midPoint;
     }
-    
+
     public static String orderBound(long orderId, int apiClientId, int apiOrderId){
         return "order bound: orderId=" + apiOrderId + " clientId=" + apiClientId + " permId=" + orderId;
     }
-    
+
     public static String completedOrder( Contract contract, Order order, OrderState orderState) {
         final StringBuilder sb = new StringBuilder(1024);
         sb.append("completed order:");
         appendOrderFields(sb, Integer.MAX_VALUE, contract, order, orderState, false);
         return sb.toString();
     }
-    
+
     public static String completedOrdersEnd() {
         return "=============== end ===============";
     }
- 
+
     private static void appendOrderFields(StringBuilder sb, int orderId, Contract contract, Order order, OrderState orderState,
             boolean isOpenOrder) {
         Util.appendValidIntValue(sb, "orderId", orderId);
@@ -733,7 +732,7 @@ public class EWrapperMsgGenerator {
         Util.appendValidDoubleValue(sb, "delta", order.delta());
         Util.appendValidDoubleValue(sb, "stockRangeLower", order.stockRangeLower());
         Util.appendValidDoubleValue(sb, "stockRangeUpper", order.stockRangeUpper());
-        
+
         Util.appendValidDoubleValue(sb, "volatility", order.volatility());
         if(order.volatility() != Double.MAX_VALUE) {
             Util.appendPositiveIntValue(sb, "volatilityType", order.getVolatilityType());
@@ -789,12 +788,12 @@ public class EWrapperMsgGenerator {
             Util.appendValidDoubleValue(sb, "referenceChangeAmount", order.referenceChangeAmount());
             Util.appendNonEmptyString(sb, "referenceExchangeId", order.referenceExchangeId());
         }
-        
+
         if ("BAG".equals(contract.getSecType())) {
             if (contract.comboLegsDescrip() != null) {
                 Util.appendNonEmptyString(sb, "comboLegsDescrip", contract.comboLegsDescrip());
             }
-            
+
             sb.append(" comboLegs={");
             if (contract.comboLegs() != null) {
                 for (int i = 0; i < contract.comboLegs().size(); ++i) {
@@ -810,7 +809,7 @@ public class EWrapperMsgGenerator {
                         Util.appendNonEmptyString(sb, "designatedLocation", comboLeg.designatedLocation());
                         Util.appendValidIntValue(sb, "exemptCode", comboLeg.exemptCode());
                     }
-                    
+
                     if (order.orderComboLegs() != null && contract.comboLegs().size() == order.orderComboLegs().size()) {
                         OrderComboLeg orderComboLeg = order.orderComboLegs().get(i);
                         Util.appendValidDoubleValue(sb, "price", orderComboLeg.price());
@@ -819,13 +818,13 @@ public class EWrapperMsgGenerator {
                 }
             }
             sb.append('}');
-            
+
             if (order.basisPoints() != Double.MAX_VALUE) {
                 Util.appendValidDoubleValue(sb, "basisPoints", order.basisPoints());
                 Util.appendValidIntValue(sb, "basisPointsType", order.basisPointsType());
             }
         }
-        
+
         if (contract.deltaNeutralContract() != null) {
             DeltaNeutralContract deltaNeutralContract = contract.deltaNeutralContract();
             sb.append(" deltaNeutralContract={");
@@ -848,7 +847,7 @@ public class EWrapperMsgGenerator {
                 sb.append('}');
             }
         }
-        
+
         if ("BAG".equals(contract.getSecType())) {
             if (order.smartComboRoutingParams() != null && order.smartComboRoutingParams().size() > 0) {
                 sb.append(" smartComboRoutingParams={");
@@ -862,7 +861,7 @@ public class EWrapperMsgGenerator {
             }
         }
 
-        
+
         Util.appendNonEmptyString(sb, "autoCancelDate", order.autoCancelDate());
         Util.appendValidDoubleValue(sb, "filledQuantity", order.filledQuantity());
         Util.appendPositiveIntValue(sb, "refFuturesConId", order.refFuturesConId());
@@ -871,11 +870,11 @@ public class EWrapperMsgGenerator {
         Util.appendBooleanFlag(sb, "imbalanceOnly", order.imbalanceOnly());
         Util.appendBooleanFlag(sb, "routeMarketableToBbo", order.routeMarketableToBbo());
         Util.appendValidLongValue(sb, "parentPermId", order.parentPermId());
-        
+
         Util.appendNonEmptyString(sb, "status", orderState.getStatus());
         Util.appendNonEmptyString(sb, "completedTime", orderState.completedTime());
         Util.appendNonEmptyString(sb, "completedStatus", orderState.completedStatus());
-        
+
         if (order.whatIf()) {
             Util.appendValidDoubleValue(sb, "initMarginBefore", orderState.initMarginBefore());
             Util.appendValidDoubleValue(sb, "maintMarginBefore", orderState.maintMarginBefore());
@@ -892,7 +891,7 @@ public class EWrapperMsgGenerator {
             Util.appendNonEmptyString(sb, "commissionCurrency", orderState.commissionCurrency());
             Util.appendNonEmptyString(sb, "warningText", orderState.warningText());
         }
-        
+
         if (order.conditions() != null && order.conditions().size() > 0) {
             sb.append(" conditions={");
             for (OrderCondition condition : order.conditions()) {
@@ -904,6 +903,6 @@ public class EWrapperMsgGenerator {
             sb.append('}');
         }
     }
-    
-    
+
+
 }

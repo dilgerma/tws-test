@@ -4,7 +4,7 @@ import com.ib.client.EClientSocket
 import com.ib.client.EJavaSignal
 import com.ib.client.EReader
 
-class IbConnection constructor(val ibClient: IbWrapper) {
+class IbConnection constructor(val ibMessageClient: IbMessageWrapper, val host:String? = "127.0.0.1", val port:Int? = 7496) {
 
     val clientSocket: EClientSocket;
     val javaSignal: EJavaSignal;
@@ -13,7 +13,7 @@ class IbConnection constructor(val ibClient: IbWrapper) {
 
     init {
         this.javaSignal = EJavaSignal();
-        this.clientSocket = EClientSocket(this.ibClient, javaSignal);
+        this.clientSocket = EClientSocket(this.ibMessageClient, javaSignal);
         this.reader = EReader(clientSocket, javaSignal)
         bgThread = Thread(Runnable {
                     while (clientSocket.isConnected) {
@@ -40,9 +40,13 @@ class IbConnection constructor(val ibClient: IbWrapper) {
         return this;
     }
 
+    fun socket() : EClientSocket {
+        return this.clientSocket;
+    }
+
     companion object {
-        fun newConnection(ibClient: IbWrapper): IbConnection {
-            return IbConnection(ibClient);
+        fun newConnection(ibMessageClient: IbMessageWrapper, host: String?, port: Int?): IbConnection {
+            return IbConnection(ibMessageClient, host, port).open();
         }
     }
 }

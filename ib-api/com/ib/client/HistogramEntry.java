@@ -5,26 +5,10 @@ package com.ib.client;
 
 public class HistogramEntry implements Comparable<HistogramEntry> {
 
-    private double price;
-    private long size;
+    public double price;
+    public long size;
 
-    public double price() {
-		return price;
-	}
-
-	public void price(double price) {
-		this.price = price;
-	}
-
-	public long size() {
-		return size;
-	}
-
-	public void size(long size) {
-		this.size = size;
-	}
-
-	public HistogramEntry(double price, long size) {
+    public HistogramEntry(double price, long size) {
         this.price = price;
         this.size = size;
     }
